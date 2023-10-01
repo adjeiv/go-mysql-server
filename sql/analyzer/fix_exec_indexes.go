@@ -103,7 +103,7 @@ func unqualify(s string) string {
 }
 
 func (s *idxScope) getIdx(n string) (int, bool) {
-	// We match the column closet to our current scope. We have already
+	// We match the column closest to our current scope. We have already
 	// resolved columns, so there will be no in-scope collisions.
 	for i := len(s.columns) - 1; i >= 0; i-- {
 		if strings.EqualFold(n, s.columns[i]) {
@@ -432,7 +432,10 @@ func fixExprToScope(e sql.Expression, scopes ...*idxScope) sql.Expression {
 	ret, _, _ := transform.Expr(e, func(e sql.Expression) (sql.Expression, transform.TreeIdentity, error) {
 		switch e := e.(type) {
 		case *expression.GetField:
-			idx, _ := newScope.getIdx(e.String())
+			idx, ok := newScope.getIdx(e.String())
+			if !ok && e.Index() != -1 {
+				return e, transform.SameTree, nil
+			}
 			return e.WithIndex(idx), transform.NewTree, nil
 		case *plan.Subquery:
 			// this |outScope| prepends the subquery scope

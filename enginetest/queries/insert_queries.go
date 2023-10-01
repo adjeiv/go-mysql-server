@@ -2666,6 +2666,10 @@ var InsertBrokenScripts = []ScriptTest{
 				Query:    "INSERT INTO t1 (a,b) values (1, DEFAULT)",
 				Expected: []sql.Row{{types.OkResult{RowsAffected: 1}}},
 			},
+			{
+				Query:    "SELECT * FROM t1",
+				Expected: []sql.Row{{1, 2}},
+			},
 		},
 	},
 }
